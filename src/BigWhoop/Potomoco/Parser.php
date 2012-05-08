@@ -26,6 +26,20 @@ class Parser implements ParserInterface
     const TOKEN_REFERENCE     = '#:';
     
     /**
+     * @var array
+     */
+    static private $tokenParsingMap = array(
+        self::TOKEN_MSGID_PLURAL  => 'parseTranslatedStringPlural',
+        self::TOKEN_MSGID         => 'parseTranslatedString',
+        self::TOKEN_MSGSTR_PLURAL => 'parseUntranslatedStringPlural',
+        self::TOKEN_MSGSTR        => 'parseUntranslatedString',
+        self::TOKEN_MULTILINE_STR => 'parseMultiLineString',
+        //self::TOKEN_CONTEXT       => 'parseContext',
+        //self::TOKEN_FLAG          => 'parseFlag',
+        //self::TOKEN_REFERENCE     => 'parseReference',
+    );
+    
+    /**
      * @var Message
      */
     private $currentMessage;
@@ -38,7 +52,7 @@ class Parser implements ParserInterface
     /**
      * @var string
      */
-    private $state = '';
+    private $multiLineState = '';
     
     
     /**
@@ -91,18 +105,7 @@ class Parser implements ParserInterface
     {
         $line = trim($line);
         
-        $mapping = array(
-            self::TOKEN_MSGID_PLURAL  => 'parseTranslatedStringPlural',
-            self::TOKEN_MSGID         => 'parseTranslatedString',
-            self::TOKEN_MSGSTR_PLURAL => 'parseUntranslatedStringPlural',
-            self::TOKEN_MSGSTR        => 'parseUntranslatedString',
-            self::TOKEN_MULTILINE_STR => 'parseMultiLineString',
-            //self::TOKEN_CONTEXT       => 'parseContext',
-            //self::TOKEN_FLAG          => 'parseFlag',
-            //self::TOKEN_REFERENCE     => 'parseReference',
-        );
-        
-        foreach ($mapping as $token => $methodName) {
+        foreach (self::$tokenParsingMap as $token => $methodName) {
             if (0 === strpos($line, $token)) {
                 $this->$methodName($line);
                 break;
@@ -134,7 +137,7 @@ class Parser implements ParserInterface
         
         if (isset($chunks[1])) {
             $this->currentMessage->msgId = $this->normalizeString($chunks[1]);
-            $this->state = self::TOKEN_MSGID;
+            $this->multiLineState = self::TOKEN_MSGID;
         }
     }
     
@@ -161,7 +164,7 @@ class Parser implements ParserInterface
         
         if (isset($chunks[1])) {
             $this->currentMessage->msgStr = $this->normalizeString($chunks[1]);
-            $this->state = self::TOKEN_MSGSTR;
+            $this->multiLineState = self::TOKEN_MSGSTR;
         }
     }
     
@@ -194,7 +197,7 @@ class Parser implements ParserInterface
     {
         $line = $this->normalizeString($line);
         
-        switch ($this->state) {
+        switch ($this->multiLineState) {
             case self::TOKEN_MSGID  :   $this->currentMessage->msgId  .= $line;   break;
             case self::TOKEN_MSGSTR :   $this->currentMessage->msgStr .= $line;   break;
         }
