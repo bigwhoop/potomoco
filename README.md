@@ -8,7 +8,7 @@ It compiles .po files to binary .mo files.
 - PHP 5.3+
 - PSR-0 autoloading
 
-## Usage
+## Use
 
     <?php
     use BigWhoop\Potomoco\Compiler.php
