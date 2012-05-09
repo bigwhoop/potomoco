@@ -2,12 +2,14 @@
 /**
  * This file is part of potomoco.
  *
- * (c) Philippe Gerber <philippe@bigwhoop.ch>
+ * (c) TrekkSoft AG (www.trekksoft.com)
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ * 
+ * @author Philippe Gerber <philippe@bigwhoop.ch>
  */
-namespace BigWhoop\Potomoco;
+namespace TrekkSoft\Potomoco;
 
 interface ParserInterface
 {

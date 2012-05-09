@@ -11,15 +11,19 @@ It compiles .po files to binary .mo files.
 ## Use
 
     <?php
-    use BigWhoop\Potomoco\Compiler.php
+    use TrekkSoft\Potomoco\Compiler
     
     $compiler = new Compiler();
-    $compiler->compile('/path/to/your/file.po'); // Generates '/path/to/your/file.mo'
+    
+    // Generates '/path/to/your/file.mo'
+    $compiler->compile('/path/to/your/file.po');
+    
+    // Generates '/path/to/other/compiled.mo'
     $compiler->compile('/path/to/your/file.po', '/path/to/other/compiled.mo');
 
-You can also use your own parser (default parser is `BigWhoop\Potomoco\Parser`).
+You can also use your own parser (default parser is `TrekkSoft\Potomoco\Parser`).
 
     $compiler->setParser(new YourParser());
 
-Custom parsers need to implement the `BigWhoop\Potomoco\ParserInterface` and return an
-array with `BigWhoop\Potomoco\Message` objects.
+Custom parsers need to implement the `TrekkSoft\Potomoco\ParserInterface` and return an
+array with `TrekkSoft\Potomoco\Message` objects.
