@@ -11,7 +11,7 @@ It compiles .po files to binary .mo files.
 ## Use
 
     <?php
-    use TrekkSoft\Potomoco\Compiler
+    use TrekkSoft\Potomoco\Compiler;
     
     $compiler = new Compiler();
     
