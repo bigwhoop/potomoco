@@ -18,6 +18,14 @@ namespace TrekkSoft\Potomoco;
  */
 class Compiler
 {
+    const MAGIC_NUMBER         = 0x950412de;
+    const REVISION             = 0;
+    const NUM_HEADER_ITEMS     = 7;
+    const NUM_HASH_TABLE_ITEMS = 0;
+    const SIZE_HEADER_ITEM     = 4; // 32 Bits
+    const SIZE_STRING_INDEX    = 8; // 64 Bits
+    const SIZE_HASH_TABLE_ITEM = 4; // 32 Bits
+    
     /**
      * @var ParserInterface
      */
@@ -119,27 +127,21 @@ class Compiler
             $messages[] = $this->getMetaMessage();
         }
         
-        $numHeaderItems                = 7;
-        $sizeHeaderItem                = 4;
-        
         $numStrings                    = count($messages);
-        $sizeStringIndex               = 8;
-        $sizeStringsTable              = $numStrings * $sizeStringIndex;
-        $offsetOriginalStringsTable    = $numHeaderItems * $sizeHeaderItem;
+        $sizeStringsTable              = $numStrings * self::SIZE_STRING_INDEX;
+        $offsetOriginalStringsTable    = self::NUM_HEADER_ITEMS * self::SIZE_HEADER_ITEM;
         $offsetTranslationStringsTable = $offsetOriginalStringsTable + $sizeStringsTable;
         
-        $numHashTableItems             = 0;
-        $sizeHashTableItem             = 4;
-        $sizeHashTable                 = $numHashTableItems * $sizeHashTableItem;
+        $sizeHashTable                 = self::NUM_HASH_TABLE_ITEMS * self::SIZE_HASH_TABLE_ITEM;
         $offsetHashTable               = $offsetTranslationStringsTable + $sizeStringsTable;
         
         $offsetStrings                 = $offsetHashTable + $sizeHashTable;
         
         // Binary data
         $data = pack(
-            str_repeat('V', $numHeaderItems),
-            0x950412de,                             // magic number = 0x950412de
-            0,                                      // file format revision = 0
+            str_repeat('V', self::NUM_HEADER_ITEMS),
+            self::MAGIC_NUMBER,                     // magic number = 0x950412de
+            self::REVISION,                         // file format revision = 0
             $numStrings,                            // number of strings
             $offsetOriginalStringsTable,            // offset of table with original strings
             $offsetTranslationStringsTable,         // offset of table with translation strings
