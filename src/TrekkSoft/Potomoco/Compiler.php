@@ -27,9 +27,9 @@ class Compiler
     const SIZE_HASH_TABLE_ITEM = 4; // 32 Bits
     
     /**
-     * @var ParserInterface
+     * @var ParserInterface|null
      */
-    private $parser;
+    private $parser = null;
     
     
     /**
@@ -72,7 +72,7 @@ class Compiler
         $messages = $parser->parse($poPath);
         $data     = $this->compileMessages($messages);
         
-        if (null == $moPath) {
+        if (null === $moPath) {
             $moPath = str_replace('.po', '.mo', $poPath);
         }
         
@@ -86,7 +86,7 @@ class Compiler
      * @param array $messages
      * @return bool
      */
-    public function searchMetaMessage(array $messages)
+    public function hasMetaMessage(array $messages)
     {
         foreach ($messages as $message) {
             if ($message->msgStr === '') {
@@ -101,7 +101,7 @@ class Compiler
     /**
      * @return Message
      */
-    private function getMetaMessage()
+    private function getDefaultMetaMessage()
     {
         $metaMessage = new Message();
         $metaMessage->msgStr = join('\n', array(
@@ -123,12 +123,13 @@ class Compiler
         // Meta message is the one with an empty string message id.
         // If none was set we define our own. So at least the encoding
         // will be present.
-        if (!$this->searchMetaMessage($messages)) {
-            $messages[] = $this->getMetaMessage();
+        if (!$this->hasMetaMessage($messages)) {
+            array_unshift($messages, $this->getDefaultMetaMessage());
         }
         
         $numStrings                    = count($messages);
         $sizeStringsTable              = $numStrings * self::SIZE_STRING_INDEX;
+        
         $offsetOriginalStringsTable    = self::NUM_HEADER_ITEMS * self::SIZE_HEADER_ITEM;
         $offsetTranslationStringsTable = $offsetOriginalStringsTable + $sizeStringsTable;
         
@@ -167,9 +168,10 @@ class Compiler
                 $originalString .= "\x00" . $message->msgIdPlural;
             }
             
-            // Append "length" and "offset" to the "strings table"
+            // Append "length" and "offset" to the index table
             $data .= pack('VV', strlen($originalString), $offsetHashTable + strlen($originalStrings));
             
+            // Append the string
             $originalStrings .= $originalString . "\x00";
         }
         
@@ -181,9 +183,10 @@ class Compiler
                                ? join("\x00", $message->msgStrPlural)
                                : $message->msgStr;
             
-            // Append "length" and "offset" to the "strings table"
+            // Append "length" and "offset" to the index table
             $data .= pack('VV', strlen($translationString), $offsetTranslationStrings + strlen($translationStrings));
             
+            // Append the string
             $translationStrings .= $translationString . "\x00";
         }
         
