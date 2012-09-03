@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-0": {
-      "TrekkSoft\\Potomoco": "src/TrekkSoft/Potomoco"
+      "TrekkSoft\\Potomoco": "src/"
     }
   }
 }
