@@ -226,6 +226,8 @@ class Parser implements ParserInterface
             $string = mb_substr($string, 0, -1);
         }
         
+        $string = stripslashes($string);
+        
         return $string;
     }
 }
